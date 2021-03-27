@@ -1,0 +1,66 @@
+{
+  "header": {
+    "text": "Go learn videos"
+  },
+  "videoList": [
+    {
+      "video": {
+        "name": {
+          "text": "go learn 1"
+        },
+        "duration": {
+          "text": "2:22",
+          "seconds": 142
+        },
+        "views": {
+          "text": "150K",
+          "count": 150000
+        },
+        "navigation": {
+          "id": "go-learn-1",
+          "pageType": "VIDEO_PAGE"
+        },
+        "author": {
+          "name": {
+            "text": "go production"
+          },
+          "navigation": {
+            "id": "go-production",
+            "pageType": "USER_PAGE"
+          }
+        }
+      }
+    },
+    {
+      "video": {
+        "name": {
+          "text": "go learn 2"
+        },
+        "duration": {
+          "text": "4:02",
+          "seconds": 242
+        },
+        "views": {
+          "text": "150K",
+          "count": 150000
+        },
+        "navigation": {
+          "id": "go-learn-1",
+          "pageType": "VIDEO_PAGE"
+        },
+        "author": {
+          "name": {
+            "text": "go production"
+          },
+          "navigation": {
+            "id": "go-production",
+            "pageType": "USER_PAGE"
+          }
+        }
+      }
+    }
+  ],
+  "clickTracking": {
+    "id": "FA09BC1156DC"
+  }
+}

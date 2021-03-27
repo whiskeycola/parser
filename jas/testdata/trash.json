@@ -1,0 +1,66 @@
+{"name"
+       :
+              -1.666e-2,
+
+
+  "trashnametrash": [
+    {
+      "name" : {
+        "test": "{}\"[}ok"
+      }
+    },
+    {
+      "name": "string\"string\""
+    },
+    {
+      "\"name": "\"name",
+      "sname"          : "ok",
+      "name": true
+    },
+    {
+      "name": false
+    },
+    {
+      "\"name\"": "\"name",
+      "sname"         : "ok",
+      "name": 5.1E+2
+    },
+    {
+      "\"name": "\"name",
+      "name"
+      : "-66"
+    }
+  ],
+  "name": {
+    "name": [
+      "name"  ,
+      true
+    ,
+      false
+            ,
+      0.123,
+      {
+        "name": []
+      },
+      1,
+      "{\"name2\": [\"hello\"]}",
+      "{\"name2\": [\"hello\"]}",
+      {
+        "hello": 123
+      },
+      [
+        [
+          "name",
+          "name"
+        ],
+        [
+          "name"
+        ]
+      ]
+    ],
+    "str": "string",
+    "obj": {},
+    "float": 555.1354E-3,
+    "array": []
+  }
+}
