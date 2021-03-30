@@ -1,6 +1,7 @@
 package jas
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -101,10 +102,29 @@ func TestVideos(t *testing.T) {
 	NewAtom(bigData).End().Prev("musicTwoRowItemRenderer").Next("url")
 }
 func BenchmarkAtom_Next(b *testing.B) {
-	j := NewAtom(bigData)
 	for i := 0; i < b.N; i++ {
+		j := NewAtom(bigData)
 		j.End().Prev("musicTwoRowItemRenderer").Next("url")
 
+	}
+}
+
+type A struct {
+	Name string `json:"name"`
+}
+
+func TestAtom_ToString(t *testing.T) {
+	a := A{
+		Name: "[]№-\\/\":,'._<header></header>?%!;#@!\n$%^&*()山上的人\u00e5\u00b1\u00b1\u00e4\u00b8\u008a\u00e7\u009a\u0084\u00e4\u00ba\u00ba_+~` 😀\U0001F9BF 😈🕶☂",
+	}
+	b, _ := json.Marshal(a)
+	atom := NewAtom(b).Next("name")
+	str1 := atom.ToString()
+	a2 := A{Name: str1}
+	b2, _ := json.Marshal(a2)
+	result := string(b) == string(b2)
+	if !result {
+		t.Fatal()
 	}
 
 }

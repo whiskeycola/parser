@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 type AtomType int
@@ -136,6 +137,22 @@ func (a *atom) Prev(name string, atp ...SelectType) *atom {
 	return nil
 }
 
+func (a *atom) Pointer() int {
+	return a.pointer
+}
+func (a *atom) Move(i int) *atom {
+	switch {
+	case a == nil:
+		return nil
+	case i > len(a.vector):
+		a.pointer = len(a.vector)
+	case i < 0:
+		a.pointer = 0
+	default:
+		a.pointer = i
+	}
+	return a
+}
 func (a *atom) Start() *atom {
 	if a == nil {
 		return nil
@@ -250,7 +267,13 @@ func (a *atom) ToString() string {
 			if len(a.vector) <= 2 {
 				return ""
 			}
-			return string(a.vector[1 : len(a.vector)-1])
+			// skip quotes
+			str := string(a.vector[1 : len(a.vector)-1])
+			str2, err := strconv.Unquote(strings.Replace(strconv.Quote(str), `\\u`, `\u`, -1))
+			if err != nil {
+				str2 = str
+			}
+			return strings.NewReplacer(`\n`, "\n", `\"`, `"`, `\/`, `/`, `\\`, `\`).Replace(str2)
 		} else {
 			return a.Take().ToString()
 		}

@@ -1,5 +1,7 @@
 package jas
 
+import "bytes"
+
 func parseAny(a *atom, s int) *atom {
 	if n := a.cache.takeAtom(a.vector, a.current); n != nil {
 		return n
@@ -189,7 +191,14 @@ func seekString(slice []byte, s int) int {
 		return s
 	}
 	for s++; s < len(slice); s++ {
-		if slice[s] == '"' && slice[s-1] != '\\' {
+		i := bytes.IndexByte(slice[s:], '"')
+		if i == -1 {
+			s = len(slice)
+		}
+		s += i
+		a := string(slice[s-1]) + string(slice[s])
+		_ = a
+		if slice[s-1] != '\\' {
 			break
 		}
 	}

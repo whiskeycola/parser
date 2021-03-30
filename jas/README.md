@@ -143,8 +143,6 @@ go func () {
 ```
 ## Pointer and current object  
 
----
-
 - atom.pointer - points where to start the next find (default 0)  
 - atom.current - points to the current object (default Root)  
 ### shift atom.pointer
@@ -178,7 +176,27 @@ atom.Next("title"). // found
 - the same behavior as atom.Next()
 ## Selection
 
----
 ### .Next()
-find first instance of name in data
+find first instance of name in data  
 if found returns the self or nil
+first param name second selectTypes
+### .Prev()
+find last instance of name in data
+analog .Next()
+### SelectType
+- SelectSting   - find data type string
+- SelectBoolean - find data type bool true or false
+- SelectNumber  - find data type number
+- SelectMap - find type object {}
+- SelectArray - find data type Array []
+- SelectNull - find data type null
+- SelectAny - find any data type  
+
+select `"author": "...`  
+analog `"(?s)\".*?[^\\]\"\s*:\*\""`\
+but this library not use regexp  
+used for search - bytes.Index and bytes.LastIndex  
+if found `"author": {...` will skip and continue searching next "author"
+```go
+atom.Next("author", jas.SelectString)
+```
