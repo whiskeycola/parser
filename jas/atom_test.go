@@ -101,6 +101,17 @@ func TestVideos(t *testing.T) {
 
 	NewAtom(bigData).End().Prev("musicTwoRowItemRenderer").Next("url")
 }
+func TestAtom_Parent(t *testing.T) {
+	rf, _ := os.Open("./testdata/test.json")
+	f, _ := ioutil.ReadAll(rf)
+	mainAtom := NewAtom(f)
+	if mainAtom.Next("duration", SelectMap) != nil {
+		p := mainAtom.Parent().Parent().Parent().Take()
+		fmt.Println(p)
+
+	}
+}
+
 func BenchmarkAtom_Next(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		j := NewAtom(bigData)

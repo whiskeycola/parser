@@ -136,7 +136,51 @@ func (a *atom) Prev(name string, atp ...SelectType) *atom {
 	a.current = -1
 	return nil
 }
-
+func (a *atom) Parent() *atom {
+	if a == nil {
+		return nil
+	}
+	i := a.current
+	aStack := 0
+	mStack := 0
+	for i--; i > 0; i-- {
+		switch a.vector[i] {
+		case '{':
+			if i > 0 && a.vector[i-1] == '\\' {
+				continue
+			}
+			if mStack == 0 {
+				a.current = i
+				a.pointer = i
+				return a
+			}
+			mStack--
+		case '}':
+			if i > 0 && a.vector[i-1] == '\\' {
+				continue
+			}
+			mStack++
+			continue
+		case '[':
+			if i > 0 && a.vector[i-1] == '\\' {
+				continue
+			}
+			if aStack == 0 {
+				a.current = i
+				a.pointer = i
+				return a
+			}
+			aStack--
+		case ']':
+			if i > 0 && a.vector[i-1] == '\\' {
+				continue
+			}
+			aStack++
+		}
+	}
+	a.current = -1
+	return nil
+}
 func (a *atom) Pointer() int {
 	return a.pointer
 }
