@@ -10,14 +10,14 @@ import (
 type AtomType int
 
 const (
-	Undefined AtomType = 0
-	Any                = Undefined
-	String    AtomType = 1 << iota
+	String AtomType = 1 << iota
 	Array
 	Map
 	Boolean
 	Number
 	Null
+	Undefined AtomType = 0
+	Any                = Undefined
 )
 
 type atom struct {
