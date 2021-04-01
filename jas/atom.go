@@ -8,25 +8,16 @@ import (
 )
 
 type AtomType int
-type SelectType int
 
 const (
-	AtomTypeUndefined AtomType = 0
-	AtomTypeString    AtomType = 1 << iota
-	AtomTypeArray
-	AtomTypeMap
-	AtomTypeBoolean
-	AtomTypeNumber
-	AtomTypeNull
-)
-const (
-	SelectAny     = SelectType(AtomTypeUndefined)
-	SelectString  = SelectType(AtomTypeString)
-	SelectMap     = SelectType(AtomTypeMap)
-	SelectArray   = SelectType(AtomTypeArray)
-	SelectBoolean = SelectType(AtomTypeBoolean)
-	SelectNumber  = SelectType(AtomTypeNumber)
-	SelectNull    = SelectType(AtomTypeNull)
+	Undefined AtomType = 0
+	Any                = Undefined
+	String    AtomType = 1 << iota
+	Array
+	Map
+	Boolean
+	Number
+	Null
 )
 
 type atom struct {
@@ -46,7 +37,7 @@ func NewAtom(vector []byte) *atom {
 	}
 }
 
-func (a *atom) Next(name string, atp ...SelectType) *atom {
+func (a *atom) Next(name string, atp ...AtomType) *atom {
 	if a == nil {
 		return nil
 	}
@@ -81,7 +72,7 @@ func (a *atom) Next(name string, atp ...SelectType) *atom {
 			return nil
 		}
 		if c != -1 {
-			if tp == SelectAny || isType(a.vector[c], AtomType(tp)) {
+			if tp == Any || isType(a.vector[c], AtomType(tp)) {
 				a.pointer = c
 				a.current = c
 				return a
@@ -93,7 +84,7 @@ func (a *atom) Next(name string, atp ...SelectType) *atom {
 	return nil
 }
 
-func (a *atom) Prev(name string, atp ...SelectType) *atom {
+func (a *atom) Prev(name string, atp ...AtomType) *atom {
 	if a == nil {
 		return nil
 	}
@@ -125,7 +116,7 @@ func (a *atom) Prev(name string, atp ...SelectType) *atom {
 			return nil
 		}
 		if c != -1 {
-			if tp == SelectAny || isType(a.vector[c], AtomType(tp)) {
+			if tp == Any || isType(a.vector[c], AtomType(tp)) {
 				a.pointer = i
 				a.current = c
 				return a
@@ -212,7 +203,7 @@ func (a *atom) End() *atom {
 	return a
 }
 func (a *atom) Pass() *atom {
-	if a.Type() == AtomTypeUndefined {
+	if a.Type() == Undefined {
 		return nil
 	}
 	if a.current == 0 {
@@ -224,7 +215,7 @@ func (a *atom) Pass() *atom {
 }
 
 func (a *atom) Root() *atom {
-	if a.Type() == AtomTypeUndefined {
+	if a.Type() == Undefined {
 		return nil
 	}
 	return &atom{
@@ -234,7 +225,7 @@ func (a *atom) Root() *atom {
 }
 
 func (a *atom) Take() *atom {
-	if a.Type() == AtomTypeUndefined {
+	if a.Type() == Undefined {
 		return nil
 	}
 	if a.current == 0 {
@@ -247,7 +238,7 @@ func (a *atom) Take() *atom {
 }
 func (a *atom) ToArray() []*atom {
 	arr := make([]*atom, 0, 10)
-	if a.Type() != AtomTypeArray {
+	if a.Type() != Array {
 		return arr
 	}
 	for i := a.current + 1; i <= len(a.vector); i++ {
@@ -268,7 +259,7 @@ func (a *atom) ToArray() []*atom {
 }
 func (a *atom) ToMap() map[string]*atom {
 	arr := make(map[string]*atom, 0)
-	if a.Type() != AtomTypeMap {
+	if a.Type() != Map {
 		return arr
 	}
 	for i := a.current + 1; i <= len(a.vector); i++ {
@@ -296,17 +287,17 @@ func (a *atom) ToMap() map[string]*atom {
 }
 func (a *atom) ToString() string {
 	t := a.Type()
-	if t&(AtomTypeNumber|AtomTypeString|AtomTypeBoolean) == 0 {
+	if t&(Number|String|Boolean) == 0 {
 		return ""
 	}
 	switch t {
-	case AtomTypeBoolean:
+	case Boolean:
 		if a.vector[a.current] == 't' {
 			return "true"
 		} else {
 			return "false"
 		}
-	case AtomTypeString:
+	case String:
 		if a.current == 0 {
 			if len(a.vector) <= 2 {
 				return ""
@@ -321,7 +312,7 @@ func (a *atom) ToString() string {
 		} else {
 			return a.Take().ToString()
 		}
-	case AtomTypeNumber:
+	case Number:
 		if a.current == 0 {
 			return string(a.vector)
 		} else {
@@ -333,9 +324,9 @@ func (a *atom) ToString() string {
 }
 
 // If you need precision
-// Before call if atom.Type() == AtomTypeBoolean
+// Before call if atom.Type() == Boolean
 func (a *atom) ToBoolean() bool {
-	if a.Type() != AtomTypeBoolean {
+	if a.Type() != Boolean {
 		return false
 	}
 	if a.vector[a.current] == 't' {
@@ -345,18 +336,18 @@ func (a *atom) ToBoolean() bool {
 }
 func (a *atom) ToFloat() float64 {
 	t := a.Type()
-	if t&(AtomTypeNumber|AtomTypeString) == 0 {
+	if t&(Number|String) == 0 {
 		return 0
 	}
 	str := ""
 	switch t {
-	case AtomTypeNumber:
+	case Number:
 		if a.current == 0 {
 			str = a.ToString()
 		} else {
 			str = parseNumber(a.vector, a.current).ToString()
 		}
-	case AtomTypeString:
+	case String:
 		str = a.ToString()
 	}
 
@@ -366,13 +357,13 @@ func (a *atom) ToFloat() float64 {
 
 func (a *atom) Type() AtomType {
 	if a == nil || a.current >= len(a.vector) || a.current < 0 {
-		return AtomTypeUndefined
+		return Undefined
 	}
 	return getType(a.vector[a.current])
 }
 
 func (a *atom) Byte() []byte {
-	if a.Type() == AtomTypeUndefined {
+	if a.Type() == Undefined {
 		return []byte{}
 	}
 	if a.current == 0 {
@@ -382,7 +373,7 @@ func (a *atom) Byte() []byte {
 }
 
 func (a *atom) Size() int {
-	if a.Type() == AtomTypeUndefined {
+	if a.Type() == Undefined {
 		return 0
 	}
 	if a.current == 0 {

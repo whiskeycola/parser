@@ -7,19 +7,19 @@ func parseAny(a *atom, s int) *atom {
 		return n
 	}
 	switch getType(a.vector[s]) {
-	case AtomTypeMap:
+	case Map:
 		return parseObject(a, s)
-	case AtomTypeArray:
+	case Array:
 		return parseObject(a, s)
-	case AtomTypeString:
+	case String:
 		str := parseString(a.vector, s)
 		a.cache.Add(s, len(str.vector))
 		return str
-	case AtomTypeBoolean:
+	case Boolean:
 		return parseBoolean(a.vector, s)
-	case AtomTypeNumber:
+	case Number:
 		return parseNumber(a.vector, s)
-	case AtomTypeNull:
+	case Null:
 		return parseNull(a.vector, s)
 	default:
 		return nil
@@ -28,14 +28,14 @@ func parseAny(a *atom, s int) *atom {
 
 func parseObject(a *atom, s int) *atom {
 	at := getType(a.vector[s])
-	if at&(AtomTypeArray|AtomTypeMap) == 0 {
+	if at&(Array|Map) == 0 {
 		return nil
 	}
 	if na := a.cache.takeAtom(a.vector, s); na != nil {
 		return na
 	}
 	var cs, cf byte = '{', '}'
-	if at == AtomTypeArray {
+	if at == Array {
 		cs, cf = '[', ']'
 
 	}
@@ -48,7 +48,7 @@ func parseObject(a *atom, s int) *atom {
 
 FOR:
 	for i++; i < len(a.vector); i++ {
-		if isType(a.vector[i], AtomTypeString) {
+		if isType(a.vector[i], String) {
 			i = seekString(a.vector, i)
 			if i >= len(a.vector) {
 				break
@@ -96,7 +96,7 @@ func parseNull(slice []byte, s int) *atom {
 	return nil
 }
 func parseString(slice []byte, s int) *atom {
-	if !isType(slice[s], AtomTypeString) {
+	if !isType(slice[s], String) {
 		return nil
 	}
 	e := seekString(slice, s)
@@ -122,44 +122,44 @@ FOR:
 
 func isType(c byte, t AtomType) bool {
 	switch {
-	case t&AtomTypeString != 0 && c == '"':
+	case t&String != 0 && c == '"':
 		return true
-	case t&AtomTypeNull != 0 && c == 'n':
+	case t&Null != 0 && c == 'n':
 		return true
-	case t&AtomTypeNumber != 0 && (c == '-' || (c >= '0' && c <= '9')):
+	case t&Number != 0 && (c == '-' || (c >= '0' && c <= '9')):
 		return true
-	case t&AtomTypeBoolean != 0 && (c == 'f' || c == 't'):
+	case t&Boolean != 0 && (c == 'f' || c == 't'):
 		return true
-	case t&AtomTypeArray != 0 && c == '[':
+	case t&Array != 0 && c == '[':
 		return true
-	case t&AtomTypeMap != 0 && c == '{':
+	case t&Map != 0 && c == '{':
 		return true
-	case t == AtomTypeUndefined:
-		return !isType(c, AtomTypeMap|AtomTypeArray|AtomTypeBoolean|AtomTypeNumber|AtomTypeString)
+	case t == Undefined:
+		return !isType(c, Map|Array|Boolean|Number|String)
 	default:
 		return false
 	}
 }
 func getType(c byte) AtomType {
 	switch {
-	case isType(c, AtomTypeMap):
-		return AtomTypeMap
-	case isType(c, AtomTypeArray):
-		return AtomTypeArray
-	case isType(c, AtomTypeBoolean):
-		return AtomTypeBoolean
-	case isType(c, AtomTypeNumber):
-		return AtomTypeNumber
-	case isType(c, AtomTypeString):
-		return AtomTypeString
-	case isType(c, AtomTypeNull):
-		return AtomTypeNull
+	case isType(c, Map):
+		return Map
+	case isType(c, Array):
+		return Array
+	case isType(c, Boolean):
+		return Boolean
+	case isType(c, Number):
+		return Number
+	case isType(c, String):
+		return String
+	case isType(c, Null):
+		return Null
 	default:
-		return AtomTypeUndefined
+		return Undefined
 	}
 }
-func selectAtot(t ...SelectType) SelectType {
-	var tp SelectType
+func selectAtot(t ...AtomType) AtomType {
+	var tp AtomType
 	for _, v := range t {
 		tp |= v
 	}
@@ -187,7 +187,7 @@ func atomIndex(slice []byte, start int) (i int) {
 	return -1
 }
 func seekString(slice []byte, s int) int {
-	if !isType(slice[s], AtomTypeString) {
+	if !isType(slice[s], String) {
 		return s
 	}
 	for s++; s < len(slice); s++ {

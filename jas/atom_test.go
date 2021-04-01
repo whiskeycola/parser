@@ -26,22 +26,22 @@ func init() {
 }
 
 func TestIsType(t *testing.T) {
-	//types := []AtomType{AtomTypeNumber, AtomTypeBoolean, AtomTypeArray, AtomTypeMap, AtomTypeString}
+	//types := []AtomType{Number, Boolean, Array, Map, String}
 	c := []struct {
 		c byte
 		t AtomType
 	}{
-		{'t', AtomTypeBoolean},
-		{'f', AtomTypeBoolean},
-		{'0', AtomTypeNumber},
-		{'1', AtomTypeNumber | AtomTypeArray},
-		{'2', AtomTypeMap | AtomTypeArray | AtomTypeBoolean | AtomTypeNumber | AtomTypeString},
-		{'9', AtomTypeNumber},
-		{'-', AtomTypeNumber},
-		{'[', AtomTypeArray},
-		{'{', AtomTypeMap},
-		{'"', AtomTypeString},
-		{'z', AtomTypeUndefined},
+		{'t', Boolean},
+		{'f', Boolean},
+		{'0', Number},
+		{'1', Number | Array},
+		{'2', Map | Array | Boolean | Number | String},
+		{'9', Number},
+		{'-', Number},
+		{'[', Array},
+		{'{', Map},
+		{'"', String},
+		{'z', Undefined},
 	}
 	for _, o := range c {
 		if !isType(o.c, o.t) {
@@ -56,9 +56,9 @@ func TestVideos(t *testing.T) {
 	f, _ := ioutil.ReadAll(rf)
 	mainAtom := NewAtom(f)
 
-	mainAtom.Next("videoList", SelectArray)
+	mainAtom.Next("videoList", Array)
 	wg := sync.WaitGroup{}
-	for mainAtom.Next("video", SelectMap) != nil {
+	for mainAtom.Next("video", Map) != nil {
 		// create new atom video block (take slice bytes)
 		videoAtom := mainAtom.Take()
 		wg.Add(1)
@@ -66,23 +66,23 @@ func TestVideos(t *testing.T) {
 			defer wg.Done()
 
 			// find first
-			if videoAtom.Next("name", SelectMap).Next("text", SelectString) == nil {
+			if videoAtom.Next("name", Map).Next("text", String) == nil {
 				fmt.Println("video name not found")
 				return
 			}
 			// take and parsing object current cursor
 			name := videoAtom.ToString()
 			// move cursor next object
-			if videoAtom.Next("duration", SelectMap).Next("seconds", SelectNumber) == nil {
+			if videoAtom.Next("duration", Map).Next("seconds", Number) == nil {
 				return
 			}
 			// take atom and convert to float
 			sec := videoAtom.ToFloat()
 			// variant two check empty string
 			author := videoAtom.End(). // move cursor to end object
-							Prev("author", SelectMap). // used reverse algorithm (find last string)
-							Next("name", SelectMap).
-							Next("text", SelectString).
+							Prev("author", Map). // used reverse algorithm (find last string)
+							Next("name", Map).
+							Next("text", String).
 							ToString()
 			// check text
 			if author == "" {
@@ -93,8 +93,8 @@ func TestVideos(t *testing.T) {
 	}
 	wg.Wait()
 	fmt.Printf("Header: %s\nTrakingId: %s\n",
-		mainAtom.Start().Next("header", SelectMap).Next("text", SelectString).ToString(),
-		mainAtom.End().Prev("clickTracking", SelectMap).Next("id", SelectString).ToString())
+		mainAtom.Start().Next("header", Map).Next("text", String).ToString(),
+		mainAtom.End().Prev("clickTracking", Map).Next("id", String).ToString())
 
 	j := NewAtom(bigData)
 	fmt.Println(j.End().Prev("header").Next("musicImmersiveHeaderRenderer").Next("title").Next("text").ToString())
@@ -105,7 +105,7 @@ func TestAtom_Parent(t *testing.T) {
 	rf, _ := os.Open("./testdata/test.json")
 	f, _ := ioutil.ReadAll(rf)
 	mainAtom := NewAtom(f)
-	if mainAtom.Next("duration", SelectMap) != nil {
+	if mainAtom.Next("duration", Map) != nil {
 		p := mainAtom.Parent().Parent().Parent().Take()
 		fmt.Println(p)
 
