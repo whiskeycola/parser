@@ -1,6 +1,10 @@
 package jas
 
-import "bytes"
+import (
+	"bytes"
+	"strconv"
+	"strings"
+)
 
 func parseAny(a *atom, s int) *atom {
 	if n := a.cache.takeAtom(a.vector, a.current); n != nil {
@@ -205,5 +209,15 @@ func seekString(slice []byte, s int) int {
 	if s < len(slice) {
 		s++
 	}
+	return s
+}
+func UnescapeString(str string) string {
+	s, err := strconv.Unquote(strings.Replace(strconv.Quote(str), `\\u`, `\u`, -1))
+	if err != nil {
+		s = str
+	}
+	s = strings.ReplaceAll(s, `\"`, `"`)
+	s = strings.ReplaceAll(s, `\/`, `/`)
+	s = strings.ReplaceAll(s, `\\`, `\`)
 	return s
 }
