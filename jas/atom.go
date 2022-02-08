@@ -246,14 +246,15 @@ func (a *atom) ToArray() []*atom {
 		if a.vector[i] == ',' {
 			continue
 		}
-		z := string(a.vector[i])
-		_ = z
 		v := parseAny(a, i)
 		if v == nil {
 			return arr
 		}
 		i += len(v.vector)
 		arr = append(arr, v)
+		if a.vector[i] == ']' {
+			break
+		}
 	}
 	return arr
 }
@@ -262,8 +263,10 @@ func (a *atom) ToMap() map[string]*atom {
 	if a.Type() != Map {
 		return arr
 	}
-	for i := a.current + 1; i <= len(a.vector); i++ {
+	for i := a.current + 1; i < len(a.vector); i++ {
 		i = seekSpace(a.vector, i)
+		//z := string(a.vector[i])
+		//fmt.Println(z)
 		if a.vector[i] == ',' {
 			continue
 		}
@@ -282,6 +285,9 @@ func (a *atom) ToMap() map[string]*atom {
 		}
 		i += len(v.vector)
 		arr[name.ToString()] = v
+		if a.vector[i] == '}' {
+			break
+		}
 	}
 	return arr
 }

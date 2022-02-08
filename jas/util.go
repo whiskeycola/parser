@@ -72,8 +72,8 @@ FOR:
 				a.cache.Add(s, i-s)
 				break FOR
 			}
-			a.cache.Add(p, i-p)
-			na.cache.Add(p-s, i-p)
+			a.cache.Add(p, i+1-p)
+			na.cache.Add(p-s, i+1-p)
 		}
 	}
 	if i < len(a.vector) {

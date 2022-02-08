@@ -6,7 +6,7 @@
 
 ### import
 ```shell
-go get github.com/geniusmerely/parser/jas
+go get github.com/whiskeycola/parser/jas
 ```
 ## Example
 testdata/test.json
@@ -83,7 +83,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/geniusmerely/parser/jas"
+	"github.com/whiskeycola/parser/jas"
 	"io/ioutil"
 	"os"
 )
